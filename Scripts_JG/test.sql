@@ -1,4 +1,3 @@
 select * from sales
-order by 
-soldDate
-desc
+where employeeID = 3
+order by soldDate
