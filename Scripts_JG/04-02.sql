@@ -1,7 +1,7 @@
 /* sold_year, sold_month, sales_amount, running_total */
-
+with cte as (
 select
-  strftime('%Y', soldDate) as Year,
+  strftime('%Y', soldDate) as year,
   case
     when strftime('%m', soldDate) == '01' then 'Jan'
     when strftime('%m', soldDate) == '02' then 'Feb'
@@ -15,11 +15,18 @@ select
     when strftime('%m', soldDate) == '10' then 'Oct'
     when strftime('%m', soldDate) == '11' then 'Nov'
     when strftime('%m', soldDate) == '12' then 'Dec'
-  end as Month,
-  SUM(salesAmount) as [Total Sales Amount]
-  /*SUM(SUM(salesAmount)) over (partition by strftime('%Y', soldDate) order by strftime('%m', soldDate)) as [Running Total] */
+  end as month,
+  SUM(salesAmount) as total_sales
 from sales as s
 group by 
-  Year, Month
+  year, strftime('%m', soldDate)
 order by
-  Year, Month
+  year, strftime('%m', soldDate)
+)
+
+select 
+  year, 
+  month, 
+  total_sales,
+  SUM(total_sales) over (partition by year order by year, month) as Running_Total
+from cte
